@@ -104,4 +104,4 @@ foreach my $port (@outbound) {
   # print `lsof -iTCP:$port -n -P -Fcpn`
 };
 
-exit ($count gt 0)?1:0;
+exit ($count > 0)?1:0;

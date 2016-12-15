@@ -35,7 +35,7 @@ while(<$fh>) {
   if($_ =~ /^c(.+)$/) { $command = $1; next; }
 
   if($_ =~ /^n([\d\.]+):(\d+)\->([\d\.]+):(\d+)/) {
-    next if($ignore_loopback and ($1 == "127.0.0.1"));
+    next if($ignore_loopback && ($1 eq "127.0.0.1"));
     $connected_ports{$2}->{pid} = $pid;
     $connected_ports{$2}->{local} = $1;
     $connected_ports{$2}->{remote} = $3;
@@ -44,7 +44,7 @@ while(<$fh>) {
     next;
   }
   if($_ =~ /^n\[([0-9a-f:]+)\]:(\d+)\->\[([0-9a-f:]+)\]:(\d+)/) {
-    next if($ignore_loopback and ($1 == "::1"));
+    next if($ignore_loopback && ($1 eq "::1"));
     $connected_ports{$2}->{pid} = $pid;
     $connected_ports{$2}->{local} = $1;
     $connected_ports{$2}->{remote} = $3;
@@ -77,7 +77,7 @@ foreach my $port (@outbound) {
     my ($f_addr, $f_port) = split /:/, $item;
     my $match_addr=0;
     my $match_port=0;
-    if(($f_addr eq '')or($f_addr eq '*')) {
+    if(($f_addr eq '')||($f_addr eq '*')) {
       $match_addr = 1;
     }elsif($f_addr =~ qr(/)) { 
       eval "use NetAddr::IP; 1" or die("Need NetAddr::IP for network matching");
@@ -87,10 +87,10 @@ foreach my $port (@outbound) {
       $match_addr = ($f_addr eq $peer->{remote});
     }
     next unless($match_addr);
-    if(($f_port eq '')or($f_port eq '*')) {
+    if(($f_port eq '')||($f_port eq '*')) {
       $match_port = 1;
     }elsif($f_port =~ /^(\d+)\-(\d+)$/) {
-      $match_port = (($peer->{port} >= $1) and ($peer->{port} <= $2));
+      $match_port = (($peer->{port} >= $1) && ($peer->{port} <= $2));
     }else {
       $match_port = ($f_port == $peer->{port});
     }

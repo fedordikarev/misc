@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use Getopt::Std;
 use strict;
@@ -34,7 +34,8 @@ while(<$fh>) {
   if($_ =~ /^p(\d+)$/) { $pid = $1; next; }
   if($_ =~ /^c(.+)$/) { $command = $1; next; }
 
-  if($_ =~ /^n([\d\.]+):(\d+)\->([\d\.]+):(\d+)/) {
+  if($_ =~ /^n([\d\.]+):(\d+)\->([\d\.]+):(\d+)/ or
+     $_ =~ /^n\[::([\d\.]+)\]:(\d+)\->\[::([\d\.]+)\]:(\d+)/) {
     next if($ignore_loopback && ($1 eq "127.0.0.1"));
     $connected_ports{$2}->{pid} = $pid;
     $connected_ports{$2}->{local} = $1;
@@ -52,7 +53,8 @@ while(<$fh>) {
     $connected_ports{$2}->{cmd} = $command;
     next;
   }
-  if($_ =~ /^n([\d\.\*]+):(\d+)$/) {
+  if($_ =~ /^n([\d\.\*]+):(\d+)$/ or
+     $_ =~ /^n\[::([\d\.\*]+)\]:(\d+)$/) {
     $listen_ports{$2} = $pid; next;
   }
   if($_ =~ /^n\[([0-9a-f:]+)\]:(\d+)$/) {
@@ -63,12 +65,12 @@ while(<$fh>) {
 
 close $fh;
 
-print "Listen ports: ".join(",", keys(%listen_ports))."\n" if($verbose);
-print "Connected ports: ".join(",", keys(%connected_ports))."\n" if($verbose);
+print "Listen ports: ".join(",", sort { $a <=> $b } keys(%listen_ports))."\n" if($verbose);
+print "Connected ports: ".join(",", sort { $a <=> $b } keys(%connected_ports))."\n" if($verbose);
 
 my @outbound = grep { ! exists($listen_ports{$_}) } keys(%connected_ports);
 
-print "Outbound: ".join(",", @outbound)."\n" if($verbose);
+print "Outbound: ".join(",", sort { $a <=> $b } @outbound)."\n" if($verbose);
 my $count = 0;
 foreach my $port (@outbound) {
   my $peer = $connected_ports{$port};
@@ -97,7 +99,7 @@ foreach my $port (@outbound) {
     if($match_addr and $match_port) { $match = 1; last; }
   }
   if($match xor $inverted) {
-    print "$peer->{cmd} [$peer->{pid}]\t" if(defined($opts{p}));
+    print "$peer->{cmd} $peer->{pid}\t" if(defined($opts{p}));
     print "$peer->{local}:$port -> $peer->{remote}:$peer->{port}\n";
     $count++;
   }

@@ -53,6 +53,8 @@ def main():
             continue
         try:
             r = requests.get("http://{}:{}/metrics".format(ip, port), timeout=10)
+            if r.status_code != 200:
+                continue
             # print(r.text)
             to_extend = 'node_name="{}",container="{}"'.format(DOCKER_HOST_NAME, c.attrs['Name'])
             if "com.docker.swarm.service.name" in c.attrs["Config"]["Labels"]:

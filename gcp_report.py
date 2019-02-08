@@ -61,7 +61,7 @@ class google_compute_api:
 
         result = dict()
         for item in instances_list['items']:
-            result[item['name']] = self.get_mach_type(item['machineType'])
+            result[item['name']] = self.get_mach_type(item['machineType']).copy()
             # print(item['name'], self.get_mach_type(item['machineType']))
             total_disk_size = 0
             for disk in item['disks']:

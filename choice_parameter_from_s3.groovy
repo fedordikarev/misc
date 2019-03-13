@@ -45,8 +45,33 @@ try {
 }
 
 
+def result_list = []
 try {
-  return s3_versions_list.intersect(gcloud_versions_list)
+  result_list = s3_versions_list.intersect(gcloud_versions_list)
 }catch (Exception e) {
   return ["failed intersect", e]
 }
+
+result_list.sort(true) { a,b ->
+    a = a.replace("^v", "")
+    b = b.replace("^v", "")
+    List verA = a.tokenize('.')
+    List verB = b.tokenize('.')
+
+    def commonIndices = Math.min(verA.size(), verB.size())
+
+    for (int i = 0; i < commonIndices; ++i) {
+      def numA = verA[i].toInteger()
+      def numB = verB[i].toInteger()
+      // println "comparing $numA and $numB"
+
+      if (numA != numB) {
+        return numA <=> numB
+      }
+    }
+
+    // If we got this far then all the common indices are identical, so whichever version is longer must be more recent
+    verA.size() <=> verB.size()
+}.reverse(true)
+
+return result_list

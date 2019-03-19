@@ -53,8 +53,8 @@ try {
 }
 
 result_list.sort(true) { a,b ->
-    a = a.replace("^v", "")
-    b = b.replace("^v", "")
+    a = a.replace("v", "")
+    b = b.replace("v", "")
     List verA = a.tokenize('.')
     List verB = b.tokenize('.')
 

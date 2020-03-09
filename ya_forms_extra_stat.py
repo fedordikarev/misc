@@ -41,8 +41,10 @@ def extra_stats(df):
             if d[who_am_i] in str(d[column_name]).split(","):
                 result[d[who_am_i]] += 1
                 for person in extra_persons:
-                    if d[person] in str(d[column_name]).split(","):
-                        result_extra[(d[who_am_i], d[person])] += 1
+                    if person == d[who_am_i]:
+                        continue
+                    if person in str(d[column_name]).split(","):
+                        result_extra[(d[who_am_i], person)] += 1
         return result, result_extra
 
     good_is_me, _ = count_me_in(who_is_good)
@@ -53,6 +55,13 @@ def extra_stats(df):
 
     print("Bad is me")
     print(bad_is_me)
+
+    print("=== Разговры с бизнесом ===")
+    for talk in business_talks:
+        result_me, result_me_with_cto = count_me_in(talk, [cto_name])
+        print(talk)
+        print("Me ", result_me)
+        print("Me and {} ".format(cto_name), result_me_with_cto)
 
 def main():
     df = read_file()

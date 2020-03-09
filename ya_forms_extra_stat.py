@@ -47,13 +47,16 @@ def extra_stats(df):
         result_extra = Counter()
         for row in df.iterrows():
             d = row[1]
-            if d[who_am_i] in str(d[column_name]).split(","):
+            if d[who_am_i] in str(d[column_name]).split(", "):
                 result[d[who_am_i]] += 1
+                # print(">>>", extra_persons)
                 for person in extra_persons:
                     if person == d[who_am_i]:
                         continue
-                    if person in str(d[column_name]).split(","):
+                    if person in str(d[column_name]).split(", "):
                         result_extra[(d[who_am_i], person)] += 1
+                        # print(d[who_am_i], d[column_name])
+                        # print(result_extra)
         return result, result_extra
 
     good_is_me, _ = count_me_in(who_is_good)

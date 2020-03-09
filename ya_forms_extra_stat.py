@@ -33,16 +33,20 @@ arch_talks = [
 cto_name = "CTO/CIO/IT Менеджер"
 
 def extra_stats(df):
-    def count_me_in(column_name):
+    def count_me_in(column_name, extra_persons=[]):
         result = Counter()
+        result_extra = Counter()
         for row in df.iterrows():
             d = row[1]
             if d[who_am_i] in str(d[column_name]).split(","):
                 result[d[who_am_i]] += 1
-        return result
+                for person in extra_persons:
+                    if d[person] in str(d[column_name]).split(","):
+                        result_extra[(d[who_am_i], d[person])] += 1
+        return result, result_extra
 
-    good_is_me = count_me_in(who_is_good)
-    bad_is_me = count_me_in(who_is_bad)
+    good_is_me, _ = count_me_in(who_is_good)
+    bad_is_me, _ = count_me_in(who_is_bad)
 
     print("Good is me")
     print(good_is_me)

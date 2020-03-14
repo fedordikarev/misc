@@ -81,7 +81,7 @@ def format_report(user, completed, uncompleted):
     for task in uncompleted:
         yield task_name(task)
 
-def save_report_to_file(user, completed, uncomplered):
+def save_report_to_file(user, completed, uncompleted):
     report_name = "{}/{}.txt".format(out_dir, user['username'])
     try:
         with open(report_name, "r") as f:
@@ -102,6 +102,25 @@ def save_report_to_file(user, completed, uncomplered):
     os.rename("{}.new".format(report_name), report_name)
     return
 
+def full_report(users, completed, uncompleted):
+    for user in users:
+        save_report_to_file(user, completed.get(user['id'], []), uncompleted.get(user['id'], []))
+
+    all_users_ids = set([x['id'] for x in users])
+    completed_ids = set(completed.keys())
+    uncompleted_ids = set(uncompleted.keys())
+
+    if all_users_ids == completed_ids.union(uncompleted_ids):
+        return
+
+    print("== Extra ==")
+    print("Users with no tasks: ")
+    print(", ".join(list(all_users_ids.difference(completed_ids.union(uncompleted_ids)))))
+    print("User ids from task with no user description: ")
+    print(", ".join(list(completed_ids.union(uncompleted_ids).difference(all_users_ids))))
+
+    return
+
 def main():
     users, todos = read_data()
     completed, uncompleted = prepare_report(todos)
@@ -110,7 +129,8 @@ def main():
     if not os.path.isdir(out_dir):
         os.mkdir(out_dir)
 
-    save_report_to_file(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])
+    # save_report_to_file(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])
+    full_report(users, completed, uncompleted)
 
 if __name__ == "__main__":
     main()

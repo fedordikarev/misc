@@ -37,7 +37,6 @@ laborum aut in quam
 """
 
 import requests
-import json
 import os
 import datetime as dt
 from collections import defaultdict
@@ -48,10 +47,12 @@ api_todos = "{}/todos".format(api_base)
 max_task_name_len = 50
 out_dir = "tasks"
 
+
 def read_data():
     users = requests.get(api_user).json()
     todos = requests.get(api_todos).json()
     return users, todos
+
 
 def prepare_report(todos):
     completed = defaultdict(list)
@@ -64,9 +65,10 @@ def prepare_report(todos):
 
     return completed, uncompleted
 
+
 def format_report(user, completed, uncompleted):
     def task_name(name):
-        ### TODO: check name uniqness, add task id to title and so
+        # TODO: check name uniqness, add task id to title and so
         return name if len(name) <= max_task_name_len else name[:max_task_name_len]+'...'
 
     now_time = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
@@ -80,6 +82,7 @@ def format_report(user, completed, uncompleted):
     yield 'Оставшиеся задачи:'
     for task in uncompleted:
         yield task_name(task)
+
 
 def save_report_to_file(user, completed, uncompleted):
     report_name = "{}/{}.txt".format(out_dir, user['username'])
@@ -102,6 +105,7 @@ def save_report_to_file(user, completed, uncompleted):
     os.rename("{}.new".format(report_name), report_name)
     return
 
+
 def full_report(users, completed, uncompleted):
     for user in users:
         save_report_to_file(user, completed.get(user['id'], []), uncompleted.get(user['id'], []))
@@ -121,6 +125,7 @@ def full_report(users, completed, uncompleted):
 
     return
 
+
 def main():
     users, todos = read_data()
     completed, uncompleted = prepare_report(todos)
@@ -131,6 +136,7 @@ def main():
 
     # save_report_to_file(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])
     full_report(users, completed, uncompleted)
+
 
 if __name__ == "__main__":
     main()

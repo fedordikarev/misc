@@ -81,12 +81,36 @@ def format_report(user, completed, uncompleted):
     for task in uncompleted:
         yield task_name(task)
 
+def save_report_to_file(user, completed, uncomplered):
+    report_name = "{}/{}.txt".format(out_dir, user['username'])
+    try:
+        with open(report_name, "r") as f:
+            prev_date = f.readline().rstrip().split()[-2:]
+    except (OSError, IOError) as e:
+        prev_date = None
+
+    with open("{}.new".format(report_name), "w") as f:
+        f.write("\n".join(format_report(user, completed, uncompleted)))
+
+    if prev_date:
+        date_fname = dt.datetime.strptime(prev_date[0]+" "+prev_date[1], "%d.%m.%Y %H:%M").strftime("%Y-%m-%dT%H:%M")
+        # or
+        # "%d.%m.%Y %H:%M" -> "%Y-%m-%dT%H:%M"
+        # date_fname = "-".join(prev_date[0].split(".")[::-1])+"T"+prev_date[1]
+        os.rename(report_name, "{}/{}_{}.txt".format(out_dir, user['username'], date_fname))
+
+    os.rename("{}.new".format(report_name), report_name)
+    return
 
 def main():
     users, todos = read_data()
     completed, uncompleted = prepare_report(todos)
 
-    print("\n".join(format_report(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])))
+    # print("\n".join(format_report(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])))
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+
+    save_report_to_file(users[0], completed[users[0]['id']], uncompleted[users[0]['id']])
 
 if __name__ == "__main__":
     main()

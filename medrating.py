@@ -91,7 +91,7 @@ def save_report_to_file(user, completed, uncompleted):
     report_name = "{}/{}.txt".format(out_dir, user['username'])
     try:
         with open(report_name, "r") as f:
-            prev_date = f.readline().rstrip().split()[-2:]
+            prev_date = f.readline().rstrip().rsplit(None, 2)[-2:]
     except (OSError, IOError) as e:
         prev_date = None
 

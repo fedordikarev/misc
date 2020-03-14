@@ -62,11 +62,12 @@ def prepare_report(todos):
         else:
             uncompleted[task['userId']].append(task['title'])
 
-    return completed, uncomplited
+    return completed, uncompleted
 
 def format_report(user, completed, uncompleted):
     def task_name(name):
-        return name if len(name) <= max_task_name_len else return name[:max_task_name_len]+'...'
+        ### TODO: check name uniqness, add task id to title and so
+        return name if len(name) <= max_task_name_len else name[:max_task_name_len]+'...'
 
     now_time = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
     yield "{name} <{email}> {date}".format(name=user['name'], email=user['email'], date=now_time)

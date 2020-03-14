@@ -49,8 +49,11 @@ out_dir = "tasks"
 
 
 def read_data():
-    users = requests.get(api_user).json()
-    todos = requests.get(api_todos).json()
+    # TODO: add try/except or check status_code to be more user friendly
+    r = requests.get(api_user); r.raise_for_status()
+    users = r.json()
+    r = requests.get(api_todos); r.raise_for_status()
+    todos = r.json()
     return users, todos
 
 

@@ -1,5 +1,6 @@
 import pandas as pd
 from collections import Counter
+from tabulate import tabulate
 import os
 
 def read_file(fname=None):
@@ -63,25 +64,25 @@ def extra_stats(df):
     bad_is_me, _ = count_me_in(who_is_bad)
 
     print("Good is me")
-    print(good_is_me)
+    print(tabulate(good_is_me.items()))
 
     print("Bad is me")
-    print(bad_is_me)
+    print(tabulate(bad_is_me.items()))
 
     print("=== Разговоры с бизнесом ===")
     for talk in business_talks:
         result_me, result_me_with_cto = count_me_in(talk, [cto_name])
         print(talk)
-        print("Me ", result_me)
-        print("Me and {} ".format(cto_name), result_me_with_cto)
+        print("Me", tabulate(result_me.items()), sep='\n')
+        print("Me and {}".format(cto_name), tabulate(result_me_with_cto.items()), sep='\n')
         print()
     print("=== Разговоры за Архитектуру ===")
     for talk in arch_talks:
         result_me, result_me_with_extra = count_me_in(talk["q"], talk.get("extra", []))
         print(talk["q"])
-        print("Me ", result_me)
+        print("Me", tabulate(result_me.items()), sep='\n')
         if result_me_with_extra:
-            print("Me and Extra", result_me_with_extra)
+            print("Me and Extra", tabulate(result_me_with_extra.items()), sep='\n')
         print()
 
 def main():

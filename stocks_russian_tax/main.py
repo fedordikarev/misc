@@ -101,7 +101,7 @@ def make_calc(args: argparse.Namespace, stock_prices: Dict[str, float], usd_rate
     beg_date = dt.strptime(args.grant_date, "%Y-%m-%d")
     move_date = dt.strptime(args.relocate_date, "%Y-%m-%d")
 
-    days_in_Russia = (move_date - beg_date).days
+    days_in_Russia = (move_date - beg_date).days + 1
     print(days_in_Russia)
     out = list()
     total = dict(
@@ -113,7 +113,7 @@ def make_calc(args: argparse.Namespace, stock_prices: Dict[str, float], usd_rate
     for rec in args.vestings:
         date, s_amount = rec.split(":")
         amount = float(s_amount)
-        delta = (dt.strptime(date, "%Y-%m-%d") - beg_date).days
+        delta = (dt.strptime(date, "%Y-%m-%d") - beg_date).days + 1
         stock_price = find_value_for_date(stock_prices, date)
         usd_rate = find_value_for_date(usd_rates, date)
 

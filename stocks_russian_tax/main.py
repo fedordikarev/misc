@@ -1,8 +1,8 @@
 import argparse
-from email import header
 import json
 from typing import Any, Dict, List
 from datetime import datetime as dt
+from datetime import timedelta
 
 
 def parse_args():
@@ -73,6 +73,30 @@ def read_stock_prices(fname: str = 'goog_prices.json') -> Dict[str, float]:
         return out
 
 
+def find_value_for_date(values: Dict[str, float], date: str) -> float:
+    """Find value for the specific date.
+
+    If there is no value for that date, take from the next possible date.
+
+    Args:
+        values: Dict with values for each data
+        date: Date look for
+    Returns:
+        value on that date on next possible date
+    """
+    if date in values:
+        return values[date]
+
+    # Never do like this
+    d_date = dt.strptime(date, "%Y-%m-%d")
+    for i in range(5):
+        d_date += timedelta(days=1)
+        s_date = d_date.strftime("%Y-%m-%d")
+        if s_date in values:
+            return values[s_date]
+
+    return 0.0
+
 def make_calc(args: argparse.Namespace, stock_prices: Dict[str, float], usd_rates: Dict[str, float]) -> List[Any]:
     beg_date = dt.strptime(args.grant_date, "%Y-%m-%d")
     move_date = dt.strptime(args.relocate_date, "%Y-%m-%d")
@@ -90,16 +114,21 @@ def make_calc(args: argparse.Namespace, stock_prices: Dict[str, float], usd_rate
         date, s_amount = rec.split(":")
         amount = float(s_amount)
         delta = (dt.strptime(date, "%Y-%m-%d") - beg_date).days
+        stock_price = find_value_for_date(stock_prices, date)
+        usd_rate = find_value_for_date(usd_rates, date)
+
         rus_amount = amount*days_in_Russia/delta
-        rus_price  = rus_amount*stock_prices[date]
-        rub_price  = rus_price*usd_rates[date]
+        rus_price  = rus_amount*stock_price
+        rub_price  = rus_price*usd_rate
         russian_tax = rub_price*args.tax_rate/100
         out_rec = dict(
             date=date,
             stocks_amount=amount,
-            stocks_price=amount*stock_prices[date],
+            stock_price=stock_price,
+            stocks_total=amount*stock_price,
             part_for_Russia=rus_amount,
             usd_for_Russia=rus_price,
+            usd_rate=usd_rate,
             rub_for_Russia=rub_price,
             russian_tax=russian_tax,
         )

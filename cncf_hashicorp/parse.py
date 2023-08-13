@@ -6,6 +6,7 @@ from datetime import datetime
 
 ### Open https://cs.k8s.io/?q=hashicorp%5C%2F&i=nope&files=go.mod&excludeFiles=&repos=
 ### copy&paste data into www-list.txt
+### TODO: check if there is api for that
 def parse_cs_k8s_io(batch: str = None):
     if not batch:
         batch = int(datetime.utcnow().timestamp())
